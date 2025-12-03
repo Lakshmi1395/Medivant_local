@@ -3,13 +3,13 @@ import { sequelize } from "../config/sequelize";
 
 // 1. Attributes in table
 export interface UsersAttributes {
-  id: number;
+  id: string;
   name: string;
   email: string;
   department: string;
   phone: string;
   password: string;
-  role_id: number;
+  role_id: string;
   is_active: boolean;
   is_deleted: boolean;
 }
@@ -23,13 +23,13 @@ export class Users
   extends Model<UsersAttributes, UsersCreationAttributes>
   implements UsersAttributes
 {
-  id!: number;
+  id!: string;
   name!: string;
   email!: string;
   department!: string;
   phone!: string;
   password!: string;
-  role_id!: number;
+  role_id!: string;
   is_active!: boolean;
   is_deleted!: boolean;
 }
@@ -38,8 +38,8 @@ export class Users
 Users.init(
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     name: {
@@ -63,7 +63,7 @@ Users.init(
       allowNull: false,
     },
     role_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
     },
     is_active: {

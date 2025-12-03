@@ -1,5 +1,6 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
 import { dbConfig } from "./dbConfig";
+import path from "path";
 
 export const sequelize = new Sequelize(
   dbConfig.database,
@@ -12,6 +13,7 @@ export const sequelize = new Sequelize(
     logging: dbConfig.logging,
     dialectOptions: dbConfig.dialectOptions,
     pool: dbConfig.pool,
+    models: [path.join(__dirname, "..", "models", "*.model.{ts,js}")],
   }
 );
 
@@ -28,4 +30,3 @@ export const syncDatabase = async () => {
     console.error("❌ Database sync failed:", err);
   }
 };
-

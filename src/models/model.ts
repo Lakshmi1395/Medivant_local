@@ -2,7 +2,7 @@ import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../config/sequelize";
 
 export class Test extends Model {
-  id: number;
+  id: string;
   is_deleted: boolean;
 }
 

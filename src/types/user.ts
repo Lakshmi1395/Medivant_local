@@ -4,5 +4,5 @@ export interface CreateUserDTO {
   department: string;
   phone: string;
   password: string;
-  role_id: number;
+  role_id: string;
 }
