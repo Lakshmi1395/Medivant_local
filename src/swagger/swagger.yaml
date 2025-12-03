@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  title: Medivant API Docs
+  version: 1.0.0
+  description: API documentation
+
+servers:
+  - url: http://localhost:8000
+
+tags:
+  - name: System
+    description: System level endpoints
+  - name: User Management
+    description: User operations under Settings
+
+paths:
+
+  /v1/healthCheck:
+    get:
+      summary: Health Check API
+      tags:
+        - System
+      description: Returns API health status.
+      responses:
+        '200':
+          description: Successful health response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Health check working"
+
+  /v1/user/add:
+    post:
+      summary: Create a new user
+      tags:
+        - User Management
+      description: Adds a user into the system.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - department
+                - phone
+                - role_id
+              properties:
+                name:
+                  type: string
+                  example: "Prasanna"
+                email:
+                  type: string
+                  format: email
+                  example: "prasanna@example.com"
+                department:
+                  type: string
+                  example: "IT"
+                phone:
+                  type: string
+                  example: "9876543210"
+                role_id:
+                  type: integer
+                  example: 2
+      responses:
+        '200':
+          description: User successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: 200
+                message: "User added successfully"
+                data:
+                  id: 1
+                  name: "Prasanna"
+                  email: "prasanna@example.com"
+                  department: "IT"
+                  phone: "9876543210"
+                  role_id: 2
+                  is_active: true
+                  is_deleted: false
+                  createdAt: "2025-12-02T16:44:39.849Z"
+                  updatedAt: "2025-12-02T16:44:39.849Z"
+
+  /v1/user:
+    get:
+      summary: List users with pagination and search
+      tags:
+        - User Management
+      description: Fetch users with pagination and optional search filter
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of records per page
+        - in: query
+          name: search
+          schema:
+            type: string
+          required: false
+          description: Filters users based on name/email/department
+      responses:
+        '200':
+          description: Users list returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                status: 200
+                message: "Users fetched successfully"
+                data:
+                  results:
+                    - id: 1
+                      name: "Prasanna"
+                      email: "prasanna@example.com"
+                      role_id: 2
+                      department: "IT"
+                      phone: "9876543210"
+                      is_active: true
+                  total: 1
+                  pageMeta:
+                    page: 1
+                    pageCount: 1
+                    nextPage: null
+                    pageSize: 10
+                    total: 1
