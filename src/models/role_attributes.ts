@@ -1,7 +1,4 @@
-import { Model, DataTypes, Optional } from "sequelize";
-import { sequelize } from "../config/sequelize";
-import { Role } from "./role";
-import { Attribute } from "./attribute";
+import { Model, DataTypes, Optional, Sequelize } from 'sequelize';
 
 export interface RoleAttributeAttributes {
   id: string;
@@ -9,40 +6,36 @@ export interface RoleAttributeAttributes {
   attribute_id: string;
 }
 
-export interface RoleAttributeCreationAttributes
-  extends Optional<RoleAttributeAttributes, "id"> {}
+export interface RoleAttributeCreationAttributes extends Optional<RoleAttributeAttributes, 'id'> {}
 
-export class RoleAttribute 
-  extends Model<RoleAttributeAttributes, RoleAttributeCreationAttributes> {}
+export class RoleAttribute extends Model<RoleAttributeAttributes, RoleAttributeCreationAttributes>
+  implements RoleAttributeAttributes {
+  public id!: string;
+  public role_id!: string;
+  public attribute_id!: string;
 
-RoleAttribute.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    role_id: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: { model: "roles", key: "id" }
-    },
-    attribute_id: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: { model: "attributes", key: "id" }
-    },
-  },
-  {
-    tableName: "role_attributes",
-    sequelize,
-    timestamps: false,
+  public static initModel(sequelize: Sequelize) {
+    RoleAttribute.init(
+      {
+        id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+        role_id: { type: DataTypes.UUID, allowNull: false, references: { model: 'roles', key: 'id' } },
+        attribute_id: { type: DataTypes.UUID, allowNull: false, references: { model: 'attributes', key: 'id' } },
+      },
+      {
+        sequelize,
+        tableName: 'role_attributes',
+        timestamps: false,
+      }
+    );
+
+    return RoleAttribute;
   }
-);
 
+  public static associate(models: any) {
+    const { Role, Attribute } = models || {};
+    if (!Role || !Attribute) return;
 
-Role.hasMany(RoleAttribute, { foreignKey: "role_id" });
-RoleAttribute.belongsTo(Role, { foreignKey: "role_id" });
-
-Attribute.hasMany(RoleAttribute, { foreignKey: "attribute_id" });
-RoleAttribute.belongsTo(Attribute, { foreignKey: "attribute_id" });
+    RoleAttribute.belongsTo(Role, { foreignKey: 'role_id', as: 'role' });
+    RoleAttribute.belongsTo(Attribute, { foreignKey: 'attribute_id', as: 'attribute' });
+  }
+}

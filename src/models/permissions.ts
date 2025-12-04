@@ -1,34 +1,42 @@
-import { Model, DataTypes, Optional } from "sequelize";
-import { sequelize } from "../config/sequelize";
+import { Model, DataTypes, Optional, Sequelize } from 'sequelize';
+import { Role } from './role';
 
-export interface PermissionAttributes {
+interface PermissionAttributes {
   id: string;
   name: string;
 }
 
-export interface PermissionCreationAttributes
-  extends Optional<PermissionAttributes, "id"> {}
+type PermissionCreationAttributes = Optional<PermissionAttributes, 'id'>;
 
-export class Permission extends Model<
-  PermissionAttributes,
-  PermissionCreationAttributes
-> {}
+export class Permission extends Model<PermissionAttributes, PermissionCreationAttributes> implements PermissionAttributes {
+  public id!: string;
+  public name!: string;
 
-Permission.init(
-  {
-    id:{
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    name: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-  },
-  {
-    tableName: "permissions",
-    sequelize,
-    timestamps: false,
+  public static initModel(sequelize: Sequelize) {
+    Permission.init(
+      {
+        id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true, allowNull: false },
+        name: { type: DataTypes.STRING(100), allowNull: false },
+      },
+      {
+        sequelize,
+        tableName: 'permissions',
+        timestamps: false,
+      }
+    );
+
+    return Permission;
   }
-);
+
+  public static associate(models: any) {
+    if (models.Role) {
+      Permission.belongsToMany(models.Role, {
+        through: 'role_permissions',
+        as: 'roles',
+        foreignKey: 'permission_id',
+        otherKey: 'role_id',
+        timestamps: false,
+      });
+    }
+  }
+}

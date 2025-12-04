@@ -13,7 +13,7 @@ export const sequelize = new Sequelize(
     logging: dbConfig.logging,
     dialectOptions: dbConfig.dialectOptions,
     pool: dbConfig.pool,
-    models: [path.join(__dirname, "..", "models", "*.model.{ts,js}")],
+    // models: [path.join(__dirname, "..", "models", "*.model.{ts,js}")],
   }
 );
 
@@ -24,6 +24,8 @@ export const verifyDBConnection = async () => {
 
 export const syncDatabase = async () => {
   try {
+    sequelize.Sequelize = Sequelize;
+
     await sequelize.sync({ alter: true }); 
     console.log("📦 Database synced successfully");
   } catch (err) {

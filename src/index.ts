@@ -111,14 +111,20 @@ import cors from "cors";
 import compression from "compression";
 
 import Router from "./routes";
-import { verifyDBConnection, syncDatabase } from "./config/sequelize";
-import { loadModels } from "./config/loadModel";
+import { syncDatabase, verifyDBConnection } from "./config/sequelize";
 import Encryption from "./encryption/encrypt";
 import ErrorHandler from "./middleware/errorHandler.middleware";
-import { setupSwagger } from "./swagger";
+import { generateSwagger, serveSwagger } from './swagger/swagger';
+import { loadModels } from "./config/loadModel";
 
 const PORT = process.env.PORT || 8000;
 const app = express();
+
+const routes1 = ['./src/swagger/admin/*.ts'];
+
+const swaggerSpec1 = generateSwagger('Medivent API Docs', '1.0.0', routes1);
+
+serveSwagger(app, swaggerSpec1, '/api/admin/docs');
 
 /* -----------------------------------------------------
    Middlewares
@@ -180,8 +186,6 @@ app.use(
 
 Router(app);
 app.use(ErrorHandler);
-setupSwagger(app);
-
 /* -----------------------------------------------------
    DB + Server Init
 ----------------------------------------------------- */
@@ -194,9 +198,9 @@ verifyDBConnection()
 
     // Sync all tables
     syncDatabase();
-
+    const suffix = process.env.NODE_ENV === 'production' ? 'api' : 'api';
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`http://localhost:${PORT}/${suffix}`);
     });
   })
   .catch((err) => {
